@@ -3,6 +3,9 @@ import * as fs from 'fs';
 import { promisify } from 'util';
 import express, { Request, Response } from 'express';
 import { Buffer } from "buffer";
+import dotenv from 'dotenv'; 
+
+dotenv.config()
 
 const client = new textToSpeech.TextToSpeechClient(); // uses ADC
 
