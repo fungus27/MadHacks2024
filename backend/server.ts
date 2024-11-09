@@ -16,6 +16,7 @@ async function getTextAudio(text: string,
     audioConfig: { audioEncoding: audioEncoding },
   };
 
+  //@ts-ignore
   const [response] = await client.synthesizeSpeech(request);
   //const writeFile = promisify(fs.writeFile);
   //await writeFile('output.mp3', response.audioContent, 'binary');
