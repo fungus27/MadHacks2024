@@ -1,12 +1,9 @@
-import * as textToSpeech from '@google-cloud/text-to-speech';
 import express from 'express';
 import dotenv from 'dotenv'; 
 
 import sendResponse from './utils/tts/tts';
 
 dotenv.config()
-
-const client = new textToSpeech.TextToSpeechClient(); // uses ADC
 
 const app = express()
 const PORT = 8888;
