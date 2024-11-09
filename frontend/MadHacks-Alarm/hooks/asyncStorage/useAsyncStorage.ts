@@ -23,8 +23,8 @@ export const storeNote = async (alarmId: string, note: Note) => {
   };
 
 
-export const storeQuery = async (queryId: string, query: GoogleQuery) => {
-    return await storeObject(queryId, query)
+export const storeQuery = async (alarmId: string, query: GoogleQuery) => {
+    return await storeObject(alarmId, query)
   };
 
 export const storeAlarm = async (alarm: Alarm) => {
@@ -65,13 +65,13 @@ export const getObject = async (key: string) => {
     return note;
   }
 
-  export const getQuery = async (queryId: string): Promise<GoogleQuery> => {
-    const query : GoogleQuery = await getObject(queryId);
+  export const getQuery = async (alarmId: string): Promise<GoogleQuery> => {
+    const query : GoogleQuery = await getObject(alarmId);
     if (query === null) {
       return {
         title: 'Error',
         content: 'Sorry, this query was not found',
-        alarmId: queryId
+        alarmId: alarmId
       }
     }
     return query;
