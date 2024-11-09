@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Button, StyleSheet, TextInput, View } from 'react-native';
 
@@ -8,9 +8,20 @@ import { ThemedView } from '@/components/ThemedView';
 import { storeObject, getObject } from '../../hooks/asyncStorage/useAsyncStorage';
 import { setAlarm } from '@/hooks/playAlarm/playAlarm';
 import { Sound } from 'expo-av/build/Audio';
+import AlarmRunningScreen from '../alarmRunningScreen';
+import Alarm from '@/hooks/asyncStorage/interfaces/Alarm';
+
+import { Link, router } from 'expo-router';
+import { AlarmContext } from '@/context/alarmContext';
 
 export default function TestAlarmScreen() {
-  const [currentAlarm, setCurrentAlarm] = React.useState<Sound>()
+  // const [currentAlarmSound, setCurrentAlarmSound] = React.useState<Sound>()
+  // const [currentAlarm, setCurrentAlarm] = React.useState<Alarm>()
+  const [currentAlarmSound, setCurrentAlarmSound, currentAlarm, setCurrentAlarm] = useContext(AlarmContext)
+
+  const openAlarmRunningScreen = () => {
+    router.navigate('/alarmRunningScreen')
+  }
   
   return (
     <ParallaxScrollView
@@ -24,14 +35,10 @@ export default function TestAlarmScreen() {
         <Button title='set alarm for 5 seconds later' onPress={() => {
           const currentTime = new Date()
           const time = new Date(currentTime.getTime() + 5 * 1000)
-          setAlarm("randomid", time, true, "helloalarm", setCurrentAlarm)
+          setAlarm("randomid", time, true, "helloalarm", setCurrentAlarmSound, openAlarmRunningScreen)
         }}/>
-        {currentAlarm !== undefined? <Button title='stop' onPress={()=>{
-          currentAlarm.stopAsync()
-          setCurrentAlarm(undefined)
-          
-        }}/>:<></>}
       </ThemedView>
+
     </ParallaxScrollView>
   );
 }

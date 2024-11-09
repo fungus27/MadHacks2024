@@ -4,39 +4,39 @@ import { SoundObject } from 'expo-av/build/Audio';
 import Alarm from '../asyncStorage/interfaces/Alarm'
 import { Sound } from 'expo-av/build/Audio';
 
-export async function playAudioUrl(url: string, setCurrentAlarm:React.Dispatch<React.SetStateAction<Sound|undefined>>) {
+export async function playAudioUrl(url: string, setCurrentAlarmSound:React.Dispatch<React.SetStateAction<Sound|undefined>>, openAlarmRunningScreen: CallableFunction) {
     await Audio.setAudioModeAsync({ playsInSilentModeIOS: true });
 
     const playbackObject  = await Audio.Sound.createAsync(
       { uri: url },
     );
     playbackObject.sound.playAsync()
-    setCurrentAlarm(playbackObject.sound)
+    setCurrentAlarmSound(playbackObject.sound)
+    openAlarmRunningScreen()
 }
 
-export const playAlarm = async (setCurrentAlarm:React.Dispatch<React.SetStateAction<Sound|undefined>>) => {  
-  playAudioUrl("https://commondatastorage.googleapis.com/codeskulptor-assets/Epoq-Lepidoptera.ogg", setCurrentAlarm)
+export const playAlarm = async (setCurrentAlarmSound:React.Dispatch<React.SetStateAction<Sound|undefined>>, openAlarmRunningScreen: CallableFunction) => {  
+  playAudioUrl("https://commondatastorage.googleapis.com/codeskulptor-assets/Epoq-Lepidoptera.ogg", setCurrentAlarmSound, openAlarmRunningScreen)
 }
 
-export const setAlarmTimeout = async (alarm: Alarm, setCurrentAlarm:React.Dispatch<React.SetStateAction<Sound|undefined>>) => {
+export const setAlarmTimeout = async (alarm: Alarm, setCurrentAlarmSound:React.Dispatch<React.SetStateAction<Sound|undefined>>, openAlarmRunningScreen: CallableFunction) => {
   const alarmTime = alarm.time.getTime()
   const currentTime = new Date().getTime()
   const timeout = alarmTime - currentTime
   console.log(timeout, alarmTime, currentTime)
-  setTimeout(() => {playAlarm(setCurrentAlarm)}, timeout);
+  setTimeout(() => {playAlarm(setCurrentAlarmSound, openAlarmRunningScreen)}, timeout);
 }
 
 
-export const setAllAlarmTimeout = async (setCurrentAlarm:React.Dispatch<React.SetStateAction<Sound|undefined>>) =>{
+export const setAllAlarmTimeout = async (setCurrentAlarmSound:React.Dispatch<React.SetStateAction<Sound|undefined>>, openAlarmRunningScreen: CallableFunction) =>{
   const alarms = await getAllAlarms()
   alarms.forEach((e)=>{
-    setAlarmTimeout(e, setCurrentAlarm)
+    setAlarmTimeout(e, setCurrentAlarmSound, openAlarmRunningScreen)
   })
 }
 
-export const setAlarm = async (id:string, time:Date, enable:boolean, name:string, setCurrentAlarm: React.Dispatch<React.SetStateAction<Sound|undefined>>
-) => {
+export const setAlarm = async (id:string, time:Date, enable:boolean, name:string, setCurrentAlarmSound: React.Dispatch<React.SetStateAction<Sound|undefined>>, openAlarmRunningScreen: CallableFunction) => {
   const alarm = {id:id, time:time, enabled:enable, name:name}
   await storeAlarm(alarm)
-  setAlarmTimeout(alarm, setCurrentAlarm)
+  setAlarmTimeout(alarm, setCurrentAlarmSound, openAlarmRunningScreen)
 }
