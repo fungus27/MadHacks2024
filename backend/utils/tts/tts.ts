@@ -19,7 +19,7 @@ async function getTextAudio(text: string,
   return response.audioContent;
 }
 
-export default async function sendResponse(req : Request, res : Response) {
+export default async function sendTTSResponse(req : Request, res : Response) {
     if (!req.body.hasOwnProperty('text'))
         throw new Error("Invalid request");
 
