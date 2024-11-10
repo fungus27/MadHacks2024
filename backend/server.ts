@@ -1,5 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv'; 
+import cors from 'cors';
 
 dotenv.config()
 
@@ -10,6 +11,7 @@ const app = express()
 const PORT = 8888;
 
 app.use(express.json())
+app.use(cors())
 
 app.post('/tts', sendTTSResponse);
 app.get('/llm/:prompt', sendLLMResponse);
