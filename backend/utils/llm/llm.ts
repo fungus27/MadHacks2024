@@ -38,7 +38,10 @@ export default async function sendLLMResponse(req, res) {
     const result = await model.generateContent(searchResults);
     const sentence = result['response']['candidates'][0]['content']['parts'][0]['text'];
 
-    const audioFileName = await getTextAudio(result);
+    const audioFileName = await getTextAudio(sentence);
     
-    res.send(audioFileName);
+    const base64Sentence = Buffer.from(sentence, 'binary').toString('base64');
+
+    res.set('X-Sentence', base64Sentence);
+    res.sendFile(audioFileName);
 }
