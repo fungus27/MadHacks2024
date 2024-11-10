@@ -15,7 +15,6 @@ import { AlarmContext } from '@/context/alarmContext';
 // notification and task set up
 
 const BACKGROUND_NOTIFICATION_TASK = 'BACKGROUND-NOTIFICATION-TASK';
-const [currentAlarmSound, setCurrentAlarmSound, currentAlarm, setCurrentAlarm] = useContext(AlarmContext)
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -37,6 +36,62 @@ TaskManager.defineTask(BACKGROUND_NOTIFICATION_TASK, ({ data, error, executionIn
 
 Notifications.registerTaskAsync(BACKGROUND_NOTIFICATION_TASK);
 
+// right actions
+const ListItem = ({item, onDelete }:{item:any; onDelete: (id: string) => void}) => {
+  const renderRightActions = () => (
+    <View style={styles.actionsContainer}>
+      <TouchableOpacity style={[styles.button, styles.delete]} onPress={() => onDelete(item.id)}>
+        <Text style={styles.actionText}>Delete</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
+  const [isEnabled, setIsEnabled] = useState(item.enabled)
+  const [showNote, setShowNote] = useState(false)
+
+  const alarmChangeEnable = () => {
+    setIsEnabled(o => {
+      item.enabled = !o
+      console.log(item.enabled)
+      updateAlarm(item.id, item)
+      return !o})
+  }
+
+  const expandNote = () => {
+    setShowNote(o => !o)
+  }
+
+  return (
+    <Pressable onPress={expandNote}>
+      <Swipeable renderRightActions={renderRightActions}>
+        <View style={styles.item}>
+          <View style={styles.itemText}>
+            <Text style={styles.itemText}>{item.name}</Text>
+            <Text style={styles.itemText}>{new Date(item.time).toLocaleDateString()}</Text>
+          </View>
+          <Text style={{color:'white', marginTop:'auto', fontSize:32}}>{new Date(item.time).toTimeString().split(' ')[0].split(":").slice(0,2).join(":")}</Text>
+          <Switch
+            trackColor={{false: '#767577', true: '#81b0ff'}}
+            thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
+            ios_backgroundColor="#3e3e3e"
+            onValueChange={alarmChangeEnable}
+            value={isEnabled}
+          />
+        </View>
+
+        {showNote? <View style={styles.noteItem}>
+          <Text style={styles.itemText}>{item.shouldQuery? "Query:":"Note:"}</Text>
+          <Text style={styles.noteText}>{item.note}</Text> 
+        </View>
+        :<></>}
+      </Swipeable>
+    </Pressable>
+  );
+};
+
+// List view
+const SwipeableList = () => {
+
 const notificationListener = useRef<Notifications.Subscription>();
 const responseListener = useRef<Notifications.Subscription>();
 const [expoPushToken, setExpoPushToken] = useState('');
@@ -44,6 +99,7 @@ const [channels, setChannels] = useState<Notifications.NotificationChannel[]>([]
 const [notification, setNotification] = useState<Notifications.Notification | undefined>(
   undefined
 );
+const [currentAlarmSound, setCurrentAlarmSound, currentAlarm, setCurrentAlarm] = useContext(AlarmContext)
 
 async function registerForPushNotificationsAsync() {
   let token;
@@ -116,61 +172,6 @@ useEffect(() => {
   };
 }, []);
 
-// right actions
-const ListItem = ({item, onDelete }:{item:any; onDelete: (id: string) => void}) => {
-  const renderRightActions = () => (
-    <View style={styles.actionsContainer}>
-      <TouchableOpacity style={[styles.button, styles.delete]} onPress={() => onDelete(item.id)}>
-        <Text style={styles.actionText}>Delete</Text>
-      </TouchableOpacity>
-    </View>
-  );
-
-  const [isEnabled, setIsEnabled] = useState(item.enabled)
-  const [showNote, setShowNote] = useState(false)
-
-  const alarmChangeEnable = () => {
-    setIsEnabled(o => {
-      item.enabled = !o
-      console.log(item.enabled)
-      updateAlarm(item.id, item)
-      return !o})
-  }
-
-  const expandNote = () => {
-    setShowNote(o => !o)
-  }
-
-  return (
-    <Pressable onPress={expandNote}>
-      <Swipeable renderRightActions={renderRightActions}>
-        <View style={styles.item}>
-          <View style={styles.itemText}>
-            <Text style={styles.itemText}>{item.name}</Text>
-            <Text style={styles.itemText}>{new Date(item.time).toLocaleDateString()}</Text>
-          </View>
-          <Text style={{color:'white', marginTop:'auto', fontSize:32}}>{new Date(item.time).toTimeString().split(' ')[0].split(":").slice(0,2).join(":")}</Text>
-          <Switch
-            trackColor={{false: '#767577', true: '#81b0ff'}}
-            thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
-            ios_backgroundColor="#3e3e3e"
-            onValueChange={alarmChangeEnable}
-            value={isEnabled}
-          />
-        </View>
-
-        {showNote? <View style={styles.noteItem}>
-          <Text style={styles.itemText}>{item.shouldQuery? "Query:":"Note:"}</Text>
-          <Text style={styles.noteText}>{item.note}</Text> 
-        </View>
-        :<></>}
-      </Swipeable>
-    </Pressable>
-  );
-};
-
-// List view
-const SwipeableList = () => {
   const [data, setData] = useState<Alarm[]>([]);
   const router = useRouter();
   
