@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { View, TextInput, TouchableOpacity, Text, StyleSheet, Button } from 'react-native';
 import { useRouter } from 'expo-router'; // This will help navigate back
 import { storeAlarm } from '@/hooks/asyncStorage/useAsyncStorage';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 
 interface Alarm {
     id: string;
@@ -11,6 +12,9 @@ interface Alarm {
 }
 const AddItemScreen = () => {
   const [newItemText, setNewItemText] = useState('');
+  const [date, setDate] = useState(new Date());
+  const [openDateModal, setOpenDateModal] = useState(false);
+  const [openTimeModal, setOpenTimeModal] = useState(false);
   const router = useRouter();
 
   const handleAddItem = async () => {
@@ -24,10 +28,31 @@ const AddItemScreen = () => {
       };
       // store new alarm using storeAlarm
       await storeAlarm(newAlarm);
+      // TODO: Set a notification for the alarm
       router.back();
     }
   };
 
+  const handleDateChange = (event: DateTimePickerEvent, date: Date) => {
+    const {
+      type,
+      nativeEvent: {timestamp, utcOffset},
+    } = event;
+    if (type === 'set') {
+      setDate(date);
+      setOpenTimeModal(true);
+    }
+    if (type === 'set' && openTimeModal) {
+      const newDate = new Date(date);
+      newDate.setHours(date.getHours());
+      newDate.setMinutes(date.getMinutes());
+      setDate(newDate);
+      setOpenTimeModal(false);
+    }
+    setOpenDateModal(false); // TODO: We need to dismiss twice to close the modal
+  };
+
+  console.log(date);
   return (
     <View style={styles.container}>
       <TextInput
@@ -36,6 +61,28 @@ const AddItemScreen = () => {
         value={newItemText}
         onChangeText={setNewItemText}
       />
+      <View style={{marginBottom:'5%', flexDirection: 'row'}}>
+      <TouchableOpacity style={styles.button} onPress={() => setOpenDateModal(true)}>
+        <Text style={styles.buttonText}>Select date and time</Text>
+      </TouchableOpacity>
+      { openDateModal && (
+              <DateTimePicker
+              style={styles.input}
+              onChange={handleDateChange}
+              value={date}
+              minimumDate={new Date()}
+            />
+          )}
+      { openTimeModal && (
+              <DateTimePicker
+              style={styles.input}
+              onChange={handleDateChange}
+              value={date}
+              minimumDate={new Date()}
+              mode="time"
+            />
+          )}
+          </View>
       <TouchableOpacity style={styles.button} onPress={handleAddItem}>
         <Text style={styles.buttonText}>Add Item</Text>
       </TouchableOpacity>

@@ -77,7 +77,7 @@ export const getObject = async (key: string) => {
     return query;
   }
 
-  export const getAllAlarms = async (): Promise<[Alarm]> => {
+  export const getAllAlarms = async (): Promise<Alarm[]> => {
     return await getObject(ALARM_LIST_KEY);
   }
 
@@ -95,4 +95,33 @@ export const getObject = async (key: string) => {
 
     const alarm = alarms.find((alarm: Alarm) => alarm.id === alarmId);
     return alarm ?? defaultAlarm;
+  }
+
+  // Performs deletion operations on AsyncStorage
+export const deleteObject = async (key: string) => {
+    try {
+      await AsyncStorage.removeItem(key);
+      return true
+    } catch (e) {
+      console.log(e)
+      return false
+    }
+  };
+
+  export const deleteNote = async (alarmId: string) => {
+    return await deleteObject(alarmId);
+  }
+
+  export const deleteQuery = async (alarmId: string) => {
+    return await deleteObject(alarmId);
+  }
+
+  export const deleteAlarm = async (alarmId: string) => {
+    const alarms = await getObject(ALARM_LIST_KEY);
+    if (alarms === null) {
+      return
+    }
+
+    const updatedAlarms = alarms.filter((alarm: Alarm) => alarm.id !== alarmId);
+    await storeObject(ALARM_LIST_KEY, updatedAlarms);
   }

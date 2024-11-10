@@ -1,16 +1,9 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput} from 'react-native';
 import {GestureHandlerRootView, Swipeable} from 'react-native-gesture-handler';
 import {useRouter} from 'expo-router';
-
-// list items
-const initialData = [
-  {id: '1', text: 'WAKE UP'},
-  {id: '2', text: 'When Life Gives You Lemons'},
-  {id: '3', text: 'Tweaking alarm'},
-  {id: '4', text: '1000 beers'},
-  {id: '5', text: 'dooby'},
-];
+import { deleteAlarm, getAllAlarms } from '@/hooks/asyncStorage/useAsyncStorage';
+import Alarm from '@/hooks/asyncStorage/interfaces/Alarm';
 
 // right actions
 const ListItem = ({item, onDelete }:{item:any; onDelete: (id: string) => void}) => {
@@ -25,7 +18,11 @@ const ListItem = ({item, onDelete }:{item:any; onDelete: (id: string) => void}) 
   return (
     <Swipeable renderRightActions={renderRightActions}>
       <View style={styles.item}>
-        <Text style={styles.itemText}>{item.text}</Text>
+        <View style={styles.itemText}>
+        <Text style={styles.itemText}>{item.name}</Text>
+        <Text style={styles.itemText}>{new Date(item.time).toLocaleDateString()}</Text>
+      </View>
+        <Text style={{color:'white', marginTop:'auto', fontSize:32}}>{new Date(item.time).toTimeString().split(' ')[0].split(":").slice(0,2).join(":")}</Text>
       </View>
     </Swipeable>
   );
@@ -33,20 +30,22 @@ const ListItem = ({item, onDelete }:{item:any; onDelete: (id: string) => void}) 
 
 // List view
 const SwipeableList = () => {
-  const [data, setData] = useState(initialData);
+  const [data, setData] = useState<Alarm[]>([]);
   const router = useRouter();
   
   const handleDelete = (id: string) => {
     setData((prevData) => prevData.filter((item) => item.id !== id));
+    deleteAlarm(id);
   };
 
-  const handleAddItem = (newItemText: string) => {
-    const newItem = {
-      id: (data.length + 1).toString(),
-      text: newItemText,
-    };
-    setData((prevData) => [...prevData, newItem]);
-  };
+  useEffect(() => {
+    // Fetch data from AsyncStorage
+    getAllAlarms().then((alarms) => {
+      if (alarms !== null) {
+        setData(alarms);
+      }
+    });
+  }, [data]);
 
   return (
     <GestureHandlerRootView style={styles.container}>
@@ -91,6 +90,8 @@ const styles = StyleSheet.create({
     padding: 20,
     marginBottom: 2,
     backgroundColor: '#2f4f4f',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   itemText: {
     fontSize: 15,
