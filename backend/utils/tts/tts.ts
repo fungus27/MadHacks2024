@@ -23,7 +23,13 @@ export async function getTextAudio(text: string,
     audioConfig: { audioEncoding: audioEncoding },
   };
 
-  //var files = fs.readdirSync('C:/tmp').filter(fn => fn.endsWith('.csv'))
+  var files = fs.readdirSync('.').filter(fn => fn.endsWith('.mp3'));
+  for (let i = 0; i < files.length; ++i) {
+      const { mtimeMs } = fs.statSync(files[i]);
+      if (Date.now() - mtimeMs >= 2 * 60 * 1000) {
+          fs.unlinkSync(files[i]);
+      }
+  }
 
   //@ts-ignore
   const [response] = await client.synthesizeSpeech(request);
