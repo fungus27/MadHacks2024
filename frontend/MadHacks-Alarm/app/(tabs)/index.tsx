@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput} from 'react-native';
 import {GestureHandlerRootView, Swipeable} from 'react-native-gesture-handler';
+import {useRouter} from 'expo-router';
 
 // list items
 const initialData = [
@@ -33,23 +34,18 @@ const ListItem = ({item, onDelete }:{item:any; onDelete: (id: string) => void}) 
 // List view
 const SwipeableList = () => {
   const [data, setData] = useState(initialData);
-  const [newItemText, setNewItemText] = useState(''); // State for the new item message
-  const [isInputVisible, setIsInputVisible] = useState(false); // controls visibility of input field
-
-  const handleAddItem = () => {
-    if (newItemText.trim() !== '') {
-      const newItem = {
-        id: (data.length + 1).toString(),
-        text: newItemText,
-      };
-      setData((prevData) => [...prevData, newItem]);
-      setNewItemText(''); // Clear the input after adding
-      setIsInputVisible(false); // hide input field after adding
-    }
-  };
-
+  const router = useRouter();
+  
   const handleDelete = (id: string) => {
     setData((prevData) => prevData.filter((item) => item.id !== id));
+  };
+
+  const handleAddItem = (newItemText: string) => {
+    const newItem = {
+      id: (data.length + 1).toString(),
+      text: newItemText,
+    };
+    setData((prevData) => [...prevData, newItem]);
   };
 
   return (
@@ -62,22 +58,11 @@ const SwipeableList = () => {
         keyExtractor={item => item.id}
         renderItem={({item}) => <ListItem item={item} onDelete={handleDelete} />}
       />
-      {isInputVisible && (
-        <View style={styles.addItemContainer}>
-          <TextInput
-            style={styles.textInput}
-            placeholder="Add new item"
-            value={newItemText}
-            onChangeText={setNewItemText}
-          />
-          <TouchableOpacity style={styles.addButton} onPress={handleAddItem}>
-          < Text style={styles.addButtonText}>Add Alarm</Text>
-          </TouchableOpacity>
-        </View>
-      )}
+      
       <TouchableOpacity
         style={styles.floatingButton}
-        onPress={() => setIsInputVisible(true)}
+        onPress={() => router.push('/add-alarm')} // Navigate to Add Alarm screens
+        // onPress={() => setIsInputVisible(true)}
       >
         <Text style={styles.floatingButtonText}>+</Text>
         </TouchableOpacity>

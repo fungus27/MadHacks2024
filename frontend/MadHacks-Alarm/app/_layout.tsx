@@ -14,9 +14,6 @@ import { AlarmContext } from '@/context/alarmContext';
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-    </Stack>
   const [currentAlarmSound, setCurrentAlarmSound] = useState<Sound>()
   const [currentAlarm, setCurrentAlarm] = useState<Alarm>()
 
@@ -42,6 +39,7 @@ export default function RootLayout() {
           <Stack.Screen name="alarmRunningScreen" options={{presentation: 'modal'}}/>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
+          
         </Stack>
       </AlarmContext.Provider>
       
