@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput} from 'react-native';
+import {View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, Pressable} from 'react-native';
 import {GestureHandlerRootView, Swipeable} from 'react-native-gesture-handler';
 import {useRouter} from 'expo-router';
 import { deleteAlarm, getAllAlarms, updateAlarm } from '@/hooks/asyncStorage/useAsyncStorage';
@@ -17,6 +17,7 @@ const ListItem = ({item, onDelete }:{item:any; onDelete: (id: string) => void}) 
   );
 
   const [isEnabled, setIsEnabled] = useState(item.enabled)
+  const [showNote, setShowNote] = useState(false)
 
   const alarmChangeEnable = () => {
     setIsEnabled(o => {
@@ -26,23 +27,35 @@ const ListItem = ({item, onDelete }:{item:any; onDelete: (id: string) => void}) 
       return !o})
   }
 
+  const expandNote = () => {
+    setShowNote(o => !o)
+  }
+
   return (
-    <Swipeable renderRightActions={renderRightActions}>
-      <View style={styles.item}>
-        <View style={styles.itemText}>
-        <Text style={styles.itemText}>{item.name}</Text>
-        <Text style={styles.itemText}>{new Date(item.time).toLocaleDateString()}</Text>
-        <Switch
-          trackColor={{false: '#767577', true: '#81b0ff'}}
-          thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
-          ios_backgroundColor="#3e3e3e"
-          onValueChange={alarmChangeEnable}
-          value={isEnabled}
-        />
-      </View>
-        <Text style={{color:'white', marginTop:'auto', fontSize:32}}>{new Date(item.time).toTimeString().split(' ')[0].split(":").slice(0,2).join(":")}</Text>
-      </View>
-    </Swipeable>
+    <Pressable onPress={expandNote}>
+      <Swipeable renderRightActions={renderRightActions}>
+        <View style={styles.item}>
+          <View style={styles.itemText}>
+            <Text style={styles.itemText}>{item.name}</Text>
+            <Text style={styles.itemText}>{new Date(item.time).toLocaleDateString()}</Text>
+          </View>
+          <Text style={{color:'white', marginTop:'auto', fontSize:32}}>{new Date(item.time).toTimeString().split(' ')[0].split(":").slice(0,2).join(":")}</Text>
+          <Switch
+            trackColor={{false: '#767577', true: '#81b0ff'}}
+            thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
+            ios_backgroundColor="#3e3e3e"
+            onValueChange={alarmChangeEnable}
+            value={isEnabled}
+          />
+        </View>
+
+        {showNote? <View style={styles.noteItem}>
+          <Text style={styles.itemText}>{item.shouldQuery? "Query:":"Note:"}</Text>
+          <Text style={styles.noteText}>{item.note}</Text> 
+        </View>
+        :<></>}
+      </Swipeable>
+    </Pressable>
   );
 };
 
@@ -115,6 +128,19 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#fffaf0',
     fontWeight: '600',
+  },
+  noteText: {
+    fontSize: 15,
+    color: '#fffaf0',
+    fontWeight: '300',
+  },
+  noteItem: {
+    padding: 20,
+    marginTop:-2,
+    marginBottom: 2,
+    backgroundColor: '#2f4f4f',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   actionsContainer: {
     flexDirection: 'row',

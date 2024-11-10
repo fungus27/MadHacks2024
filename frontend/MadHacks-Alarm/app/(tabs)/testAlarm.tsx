@@ -46,7 +46,6 @@ export default function TestAlarmScreen() {
     router.navigate('/alarmRunningScreen')
   }
 
-
   async function registerForPushNotificationsAsync() {
     let token;
 
@@ -56,12 +55,7 @@ export default function TestAlarmScreen() {
         importance: Notifications.AndroidImportance.MAX,
         vibrationPattern: [0, 250, 250, 250],
         lightColor: '#FF231F7C',
-      });
-
-      await Notifications.setNotificationChannelAsync('new-notification', {
-        name: 'new-notification',
-        importance: Notifications.AndroidImportance.MAX,
-        sound: 'bombalarm.wav'
+        sound:'default'
       });
     }
 
@@ -131,17 +125,14 @@ export default function TestAlarmScreen() {
     };
   }, []);
 
-  const notif = () => {
+  const setupNotification = (title:string, body:string, triggerSecond:number) => {
     Notifications.scheduleNotificationAsync({
       content: {
-        title: "Time's up!",
-        body: 'Change sides!',
-        data: { data: 'goes here', test: { test1: 'more data' } },
-        sound: 'bombalarm.wav'
+        title: title,
+        body: body
       },
       trigger: {
-        seconds: 1,
-        channelId: 'new-notification'
+        seconds: triggerSecond
       },
     });
   }
