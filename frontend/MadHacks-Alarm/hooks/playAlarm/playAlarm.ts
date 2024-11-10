@@ -7,13 +7,13 @@ import * as Notifications from 'expo-notifications';
 
 export async function playAudioUrl(url: string, setCurrentAlarmSound:React.Dispatch<React.SetStateAction<Sound|undefined>>, openAlarmRunningScreen: CallableFunction) {
     await Audio.setAudioModeAsync({ playsInSilentModeIOS: true });
+    openAlarmRunningScreen()
 
     const playbackObject  = await Audio.Sound.createAsync(
       { uri: url },
     );
     playbackObject.sound.playAsync()
     setCurrentAlarmSound(playbackObject.sound)
-    openAlarmRunningScreen()
 }
 
 export const playAlarm = async (note: string, shouldQuery: boolean, setCurrentAlarmSound:React.Dispatch<React.SetStateAction<Sound|undefined>>, openAlarmRunningScreen: CallableFunction) => {  
@@ -27,8 +27,8 @@ export const setAlarmTimeout = async (alarm: Alarm, setCurrentAlarmSound:React.D
   const currentTime = new Date().getTime()
   const timeout = alarmTime - currentTime
   console.log(timeout, alarmTime, currentTime)
-  setupNotification(alarm, timeout/1000)
-  return setTimeout(() => {console.log('ring ring');playAlarm(setCurrentAlarmSound, openAlarmRunningScreen)}, timeout);
+  setupNotification(alarm, Math.max(timeout/1000-15, 0))
+  return setTimeout(() => {console.log('ring ring');playAlarm(alarm.note, alarm.shouldQuery, setCurrentAlarmSound, openAlarmRunningScreen)}, timeout);
 }
 
 export const setAlarm = async (id:string, time:Date, enable:boolean, name:string, note:string, shouldQuery:boolean, setCurrentAlarmSound: React.Dispatch<React.SetStateAction<Sound|undefined>>, openAlarmRunningScreen: CallableFunction) => {
@@ -43,7 +43,7 @@ const setupNotification = (alarm:Alarm, triggerSecond:number) => {
     content: {
       title: alarm.name,
       body: alarm.note,
-      data: {alarm: alarm}
+      data: alarm
     },
     trigger: {
       seconds: triggerSecond

@@ -1,7 +1,7 @@
 import React, {useContext, useEffect, useRef, useState} from 'react';
 import {View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, Pressable, Platform} from 'react-native';
 import {GestureHandlerRootView, Swipeable} from 'react-native-gesture-handler';
-import {useRouter} from 'expo-router';
+import {router, useRouter} from 'expo-router';
 import { deleteAlarm, getAllAlarms, updateAlarm } from '@/hooks/asyncStorage/useAsyncStorage';
 import Alarm from '@/hooks/asyncStorage/interfaces/Alarm';
 import { Switch } from 'react-native-gesture-handler';
@@ -29,9 +29,7 @@ const openAlarmRunningScreen = () => {
 }
 
 TaskManager.defineTask(BACKGROUND_NOTIFICATION_TASK, ({ data, error, executionInfo }) => {
-  console.log('Received a notification in the background!');
-  console.log(data.alarm.id)
-  playAlarm(data.alarm.note, data.alarm.shouldQuery, setCurrentAlarmSound, openAlarmRunningScreen)
+  // playAlarm(data.alarm.note, data.alarm.shouldQuery, setCurrentAlarmSound, openAlarmRunningScreen)
 });
 
 Notifications.registerTaskAsync(BACKGROUND_NOTIFICATION_TASK);
@@ -150,7 +148,7 @@ async function registerForPushNotificationsAsync() {
   return token;
 }
 
-useEffect(() => {
+  useEffect(() => {
   registerForPushNotificationsAsync().then(token => token && setExpoPushToken(token));
 
   if (Platform.OS === 'android') {
@@ -161,7 +159,9 @@ useEffect(() => {
   });
 
   responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-    console.log(response);
+    const alarm = response.notification.request.content.data
+    clearTimeout(alarm.timeoutId)
+    playAlarm(alarm.note, alarm.shouldQuery, setCurrentAlarmSound, openAlarmRunningScreen)
   });
 
   return () => {
@@ -170,7 +170,7 @@ useEffect(() => {
     responseListener.current &&
       Notifications.removeNotificationSubscription(responseListener.current);
   };
-}, []);
+  }, []);
 
   const [data, setData] = useState<Alarm[]>([]);
   const router = useRouter();
