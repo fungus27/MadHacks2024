@@ -4,12 +4,26 @@ import { Button, Text, View } from 'react-native';
 
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { AlarmContext } from '@/context/alarmContext';
+import * as Notifications from 'expo-notifications';
 
 export default function AlarmRunningScreen() {
   const [currentAlarmSound, setCurrentAlarmSound, currentAlarm, setCurrentAlarm] = useContext(AlarmContext)
   const date:Date = new Date()
+
+  useEffect(() => {
+    try{
+      Notifications.cancelScheduledNotificationAsync(currentAlarm.notificationId)
+      console.log("Notification cancelled")
+      Notifications.dismissAllNotificationsAsync()
+      console.log("All notifications dismissed")
+    }
+    catch(e){
+      console.log("Notification wasn't cancelled successfully: " + e)
+    }
+  },[currentAlarmSound])
+
   console.log(currentAlarm)
   return (
     <>

@@ -6,6 +6,7 @@ export default interface Alarm {
     note: string;
     shouldQuery: boolean;
     timeoutId: NodeJS.Timeout;
+    notificationId: string;
     // repeat: boolean;
     // repeatDays: boolean[];
 }

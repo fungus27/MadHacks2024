@@ -2,6 +2,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Alarm from './interfaces/Alarm'
 
+import * as Notifications from 'expo-notifications';
+
+
 const ALARM_LIST_KEY = 'alarms';
 
 // Stores generic objects in AsyncStorage
@@ -55,7 +58,8 @@ export const getObject = async (key: string) => {
       name: 'Sorry, this alarm was not found',
       note: 'Sorry, this alarm was not found',
       shouldQuery: false,
-      timeoutId: setTimeout(()=>{},0)
+      timeoutId: setTimeout(()=>{},0),
+      notificationId: ""
     }
     if (alarms === null) {
       return defaultAlarm;
@@ -86,6 +90,7 @@ export const deleteObject = async (key: string) => {
       if (alarm.id === alarmId) {
         // Cancel timeout with timeoutId
         clearTimeout(alarm.timeoutId)
+        Notifications.cancelScheduledNotificationAsync(alarm.notificationId)
         return false
       }
       return true
@@ -104,6 +109,10 @@ export const deleteObject = async (key: string) => {
           // Cancel timeout with timeoutId
           console.log('cancelling timeout')
           clearTimeout(alarm.timeoutId)
+
+          // Cancel notification with notificationId
+          console.log('cancelling notification')
+          Notifications.cancelScheduledNotificationAsync(alarm.notificationId)
         }
         else {
           // Set new timeout
@@ -115,6 +124,10 @@ export const deleteObject = async (key: string) => {
             const timeoutId = setTimeout(() => {console.log('ring ring')}, offset); // TODO: play alarm
             updatedAlarm.timeoutId = timeoutId;
           }
+
+          // Set new notification
+          Notifications.cancelScheduledNotificationAsync(alarm.notificationId)
+          // TODO: set new notification
         }
         return [...prev, updatedAlarm]
       }

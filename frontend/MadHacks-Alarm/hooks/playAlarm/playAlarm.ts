@@ -28,19 +28,22 @@ export const setAlarmTimeout = async (alarm: Alarm, setCurrentAlarmSound:React.D
   const currentTime = new Date().getTime()
   const timeout = alarmTime - currentTime
   console.log(timeout, alarmTime, currentTime)
-  setupNotification(alarm, Math.max(timeout/1000-15, 0))
-  return setTimeout(() => {console.log('ring ring');playAlarm(alarm.note, alarm.shouldQuery, setCurrentAlarmSound, openAlarmRunningScreen, setCurrentAlarm, alarm)}, timeout);
+  const timeoutId = setTimeout(() => {console.log('ring ring');playAlarm(alarm.note, alarm.shouldQuery, setCurrentAlarmSound, openAlarmRunningScreen, setCurrentAlarm, alarm)}, timeout);
+  return timeoutId
 }
 
 export const setAlarm = async (id:string, time:Date, enable:boolean, name:string, note:string, shouldQuery:boolean, setCurrentAlarmSound: React.Dispatch<React.SetStateAction<Sound|undefined>>, openAlarmRunningScreen: CallableFunction, setCurrentAlarm:CallableFunction) => {
-  const alarm: Alarm = {id:id, time:time, enabled:enable, name:name, timeoutId: setTimeout(()=>{},1), note:note, shouldQuery:shouldQuery}
+  const alarm: Alarm = {id:id, time:time, enabled:enable, name:name, timeoutId: setTimeout(()=>{},1), note:note, shouldQuery:shouldQuery, notificationId: ""}
   const timeoutId = await setAlarmTimeout(alarm, setCurrentAlarmSound, openAlarmRunningScreen, setCurrentAlarm);
-  alarm.timeoutId = timeoutId;
+  alarm.timeoutId = timeoutId
+
+  const notificationId = await setupNotification(alarm, Math.max((alarm.time.getTime() - new Date().getTime())/1000-15, 0))
+  alarm.notificationId = notificationId
   return alarm;
 }
 
-const setupNotification = (alarm:Alarm, triggerSecond:number) => {
-  Notifications.scheduleNotificationAsync({
+export const setupNotification = async(alarm:Alarm, triggerSecond:number) => {
+  return await Notifications.scheduleNotificationAsync({
     content: {
       title: alarm.name,
       body: alarm.note,
@@ -50,4 +53,5 @@ const setupNotification = (alarm:Alarm, triggerSecond:number) => {
       seconds: triggerSecond
     },
   });
+
 }
