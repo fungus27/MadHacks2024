@@ -176,7 +176,6 @@ async function registerForPushNotificationsAsync() {
   const router = useRouter();
   
   const handleDelete = (id: string) => {
-    setData((prevData) => prevData.filter((item) => item.id !== id));
     deleteAlarm(id);
   };
 
@@ -185,6 +184,8 @@ async function registerForPushNotificationsAsync() {
     getAllAlarms().then((alarms) => {
       if (alarms !== null) {
         setData(alarms);
+      } else {
+        setData([])
       }
     });
   }, [data]);
