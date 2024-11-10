@@ -102,7 +102,19 @@ export const deleteObject = async (key: string) => {
       if(alarm.id === alarmId) {
         if (updatedAlarm.enabled === false) {
           // Cancel timeout with timeoutId
+          console.log('cancelling timeout')
           clearTimeout(alarm.timeoutId)
+        }
+        else {
+          // Set new timeout
+          const offset = new Date(updatedAlarm.time).getTime() - new Date().getTime();
+          console.log('setting new timeout')
+          console.log(offset)
+          clearTimeout(alarm.timeoutId)
+          if (offset > 0) {
+            const timeoutId = setTimeout(() => {console.log('ring ring')}, offset); // TODO: play alarm
+            updatedAlarm.timeoutId = timeoutId;
+          }
         }
         return [...prev, updatedAlarm]
       }

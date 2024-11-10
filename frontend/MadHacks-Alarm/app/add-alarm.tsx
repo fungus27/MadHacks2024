@@ -35,11 +35,11 @@ const AddItemScreen = () => {
       type,
       nativeEvent: {timestamp, utcOffset},
     } = event;
+    setOpenDateModal(false);
     if (type === 'set') {
       setDate(date);
       setOpenTimeModal(true);
     }
-    setOpenDateModal(false);
   };
 
   const handleTimeChange = (event: DateTimePickerEvent, date: Date) => {
@@ -47,10 +47,10 @@ const AddItemScreen = () => {
       type,
       nativeEvent: {timestamp, utcOffset},
     } = event;
+    setOpenTimeModal(false);
     if (type === 'set' && openTimeModal) {
       setDate(date);
     }
-    setOpenTimeModal(false);
   }
 
   return (
