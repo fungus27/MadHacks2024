@@ -36,11 +36,6 @@ TaskManager.defineTask(BACKGROUND_NOTIFICATION_TASK, ({ data, error, executionIn
 
 Notifications.registerTaskAsync(BACKGROUND_NOTIFICATION_TASK);
 
-Notifications.setNotificationChannelAsync('new-notification', {
-  name: 'new-notification',
-  importance: Notifications.AndroidImportance.MAX,
-  sound: 'bomb-alarm.wav'
-});
 
 export default function TestAlarmScreen() {
   // const [currentAlarmSound, setCurrentAlarmSound] = React.useState<Sound>()
@@ -61,6 +56,12 @@ export default function TestAlarmScreen() {
         importance: Notifications.AndroidImportance.MAX,
         vibrationPattern: [0, 250, 250, 250],
         lightColor: '#FF231F7C',
+      });
+
+      await Notifications.setNotificationChannelAsync('new-notification', {
+        name: 'new-notification',
+        importance: Notifications.AndroidImportance.MAX,
+        sound: 'bombalarm.wav'
       });
     }
 
@@ -136,7 +137,7 @@ export default function TestAlarmScreen() {
         title: "Time's up!",
         body: 'Change sides!',
         data: { data: 'goes here', test: { test1: 'more data' } },
-        sound: 'bomb-alarm.wav'
+        sound: 'bombalarm.wav'
       },
       trigger: {
         seconds: 1,
