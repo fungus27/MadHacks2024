@@ -19,7 +19,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.anonymous.MadHacksAlarm"
     },
     "web": {
       "bundler": "metro",
@@ -27,10 +28,22 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      [
+        "expo-notifications",
+        {
+          "sounds": [
+            "assets/bomb-alarm.wav"
+          ]
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "b64e76f4-985a-465c-a779-3a6a67eaf249"
+      }
     }
   }
 }
