@@ -15,8 +15,10 @@ export async function playAudioUrl(url: string, setCurrentAlarmSound:React.Dispa
     openAlarmRunningScreen()
 }
 
-export const playAlarm = async (setCurrentAlarmSound:React.Dispatch<React.SetStateAction<Sound|undefined>>, openAlarmRunningScreen: CallableFunction) => {  
-  playAudioUrl("http://10.140.27.228:8888/tts/I%20am%20aliveeee,%20yaay!", setCurrentAlarmSound, openAlarmRunningScreen)
+export const playAlarm = async (note: string, shouldQuery: boolean, setCurrentAlarmSound:React.Dispatch<React.SetStateAction<Sound|undefined>>, openAlarmRunningScreen: CallableFunction) => {  
+  const url = `http://10.140.122.223:8888/${shouldQuery ? 'llm' : 'tts'}/${note}`
+  console.log("playing alarm from "+url)
+  playAudioUrl(url, setCurrentAlarmSound, openAlarmRunningScreen)
 }
 
 export const setAlarmTimeout = async (alarm: Alarm, setCurrentAlarmSound:React.Dispatch<React.SetStateAction<Sound|undefined>>, openAlarmRunningScreen: CallableFunction) => {
@@ -24,7 +26,7 @@ export const setAlarmTimeout = async (alarm: Alarm, setCurrentAlarmSound:React.D
   const currentTime = new Date().getTime()
   const timeout = alarmTime - currentTime
   console.log(timeout, alarmTime, currentTime)
-  return setTimeout(() => {console.log('ring ring');playAlarm(setCurrentAlarmSound, openAlarmRunningScreen)}, timeout);
+  return setTimeout(() => {console.log('ring ring');playAlarm(alarm.note, alarm.shouldQuery, setCurrentAlarmSound, openAlarmRunningScreen)}, timeout);
 }
 
 export const setAlarm = async (id:string, time:Date, enable:boolean, name:string, note:string, shouldQuery:boolean, setCurrentAlarmSound: React.Dispatch<React.SetStateAction<Sound|undefined>>, openAlarmRunningScreen: CallableFunction) => {
