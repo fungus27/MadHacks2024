@@ -7,7 +7,7 @@ dotenv.config()
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-const systemPrompt = "You are a helpful morning assistant. Given the QUERY and the search engine result RESULTS sent by the user, please give the user the exact information they want in one sentence. Be consistent, objective and concise."
+const systemPrompt = "You are a helpful morning assistant. Given the QUERY and the search engine result RESULTS sent by the user, please give the user the exact information they want in exactly four sentences. Be consistent, objective and concise."
 
 const model = genAI.getGenerativeModel({ 
     model: "gemini-1.5-flash",
