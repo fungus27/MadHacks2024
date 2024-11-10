@@ -13,5 +13,5 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-  ]
+, "hooks/playAlarm/alarm.jsx", "hooks/playAlarm/playAlarm.ts", "context/alarmContext.jsx"  ]
 }
