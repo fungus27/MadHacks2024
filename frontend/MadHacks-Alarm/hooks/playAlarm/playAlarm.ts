@@ -24,19 +24,12 @@ export const setAlarmTimeout = async (alarm: Alarm, setCurrentAlarmSound:React.D
   const currentTime = new Date().getTime()
   const timeout = alarmTime - currentTime
   console.log(timeout, alarmTime, currentTime)
-  setTimeout(() => {playAlarm(setCurrentAlarmSound, openAlarmRunningScreen)}, timeout);
+  return setTimeout(() => {console.log('ring ring');playAlarm(setCurrentAlarmSound, openAlarmRunningScreen)}, timeout);
 }
 
-
-export const setAllAlarmTimeout = async (setCurrentAlarmSound:React.Dispatch<React.SetStateAction<Sound|undefined>>, openAlarmRunningScreen: CallableFunction) =>{
-  const alarms = await getAllAlarms()
-  alarms.forEach((e)=>{
-    setAlarmTimeout(e, setCurrentAlarmSound, openAlarmRunningScreen)
-  })
-}
-
-export const setAlarm = async (id:string, time:Date, enable:boolean, name:string, setCurrentAlarmSound: React.Dispatch<React.SetStateAction<Sound|undefined>>, openAlarmRunningScreen: CallableFunction) => {
-  const alarm = {id:id, time:time, enabled:enable, name:name}
-  await storeAlarm(alarm)
-  setAlarmTimeout(alarm, setCurrentAlarmSound, openAlarmRunningScreen)
+export const setAlarm = async (id:string, time:Date, enable:boolean, name:string, note:string, shouldQuery:boolean, setCurrentAlarmSound: React.Dispatch<React.SetStateAction<Sound|undefined>>, openAlarmRunningScreen: CallableFunction) => {
+  const alarm: Alarm = {id:id, time:time, enabled:enable, name:name, timeoutId: setTimeout(()=>{},1), note:note, shouldQuery:shouldQuery}
+  const timeoutId = await setAlarmTimeout(alarm, setCurrentAlarmSound, openAlarmRunningScreen);
+  alarm.timeoutId = timeoutId;
+  return alarm;
 }

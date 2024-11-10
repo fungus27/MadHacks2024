@@ -15,10 +15,15 @@ export default function AlarmRunningScreen() {
       <Stack.Screen options={{ title: 'Alarm!' }} />
       <ThemedView style={styles.container}>
         <ThemedText>
+          {currentAlarm?.name}
+        </ThemedText>
+        <ThemedText>
           {date.getHours()}:{date.getMinutes()}
         </ThemedText>
         <Button title='stop' onPress={()=>{
           currentAlarmSound.stopAsync()
+          setCurrentAlarm(null)
+          setCurrentAlarmSound(null)
           router.back()
         }
 

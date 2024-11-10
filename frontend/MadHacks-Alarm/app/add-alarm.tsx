@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet, Switch } from 'react-native';
 import { useRouter } from 'expo-router'; // This will help navigate back
 import { storeAlarm } from '@/hooks/asyncStorage/useAsyncStorage';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import Alarm from '@/hooks/asyncStorage/interfaces/Alarm';
+import { setAlarm } from '@/hooks/playAlarm/playAlarm';
+import { AlarmContext } from '@/context/alarmContext';
 
 const AddItemScreen = () => {
   const [newItemText, setNewItemText] = useState('');
@@ -12,22 +14,18 @@ const AddItemScreen = () => {
   const [openTimeModal, setOpenTimeModal] = useState(false);
   const [note, setNote] = useState('');
   const [query, setQuery] = useState(false);
+  const [currentAlarmSound, setCurrentAlarmSound, currentAlarm, setCurrentAlarm] = useContext(AlarmContext)
+
+  const openAlarmRunningScreen = () => {
+    router.navigate('/alarmRunningScreen')
+  }
+
   const router = useRouter();
 
   const handleAddItem = async () => {
     if (newItemText.trim() !== '') {
-      
-      const newAlarm: Alarm = {
-        id: date.toISOString(), // acts as unique ID
-        time: date,   // sets the current date and time for now
-        enabled: true, 
-        name: newItemText, // sets text input as the name of the alarm
-        note: note,
-        shouldQuery: query
-      };
-      // store new alarm using storeAlarm
-      await storeAlarm(newAlarm);
-      // TODO: Set a notification for the alarm
+      const alarm = await setAlarm(newItemText+new Date(date).toLocaleDateString(), date, true, newItemText, note, query, setCurrentAlarmSound, openAlarmRunningScreen);
+      await storeAlarm(alarm);
       router.back();
     }
   };
