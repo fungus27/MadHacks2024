@@ -24,7 +24,7 @@ const AddItemScreen = () => {
 
   const handleAddItem = async () => {
     if (newItemText.trim() !== '') {
-      const alarm = await setAlarm(newItemText+new Date(date).toLocaleDateString(), date, true, newItemText, note, query, setCurrentAlarmSound, openAlarmRunningScreen);
+      const alarm = await setAlarm(newItemText+new Date(date).toLocaleDateString(), date, true, newItemText, note, query, setCurrentAlarmSound, openAlarmRunningScreen, setCurrentAlarm);
       await storeAlarm(alarm);
       router.back();
     }

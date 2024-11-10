@@ -36,7 +36,7 @@ export default function RootLayout() {
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <AlarmContext.Provider value={[currentAlarm, setCurrentAlarm, currentAlarmSound, setCurrentAlarmSound]}>
         <Stack>
-          <Stack.Screen name="alarmRunningScreen" options={{presentation: 'modal'}}/>
+          <Stack.Screen name="alarmRunningScreen" options={{presentation: 'modal',headerShown: false }}/>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" />
           

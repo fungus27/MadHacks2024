@@ -161,7 +161,7 @@ async function registerForPushNotificationsAsync() {
   responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
     const alarm = response.notification.request.content.data
     clearTimeout(alarm.timeoutId)
-    playAlarm(alarm.note, alarm.shouldQuery, setCurrentAlarmSound, openAlarmRunningScreen)
+    playAlarm(alarm.note, alarm.shouldQuery, setCurrentAlarmSound, openAlarmRunningScreen, setCurrentAlarm, alarm)
   });
 
   return () => {
