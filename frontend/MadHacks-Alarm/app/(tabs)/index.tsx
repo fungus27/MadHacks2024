@@ -193,7 +193,7 @@ async function registerForPushNotificationsAsync() {
   return (
     <GestureHandlerRootView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Welcome!</Text>
+        <Text style={styles.title}>Remind Me That...</Text>
       </View>
       <FlatList
         data={data}
@@ -220,6 +220,7 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: '#2f4f4f',
     padding: 20,
+    paddingTop:50,
     alignItems: 'center',
     borderBottomWidth: 1,
     borderBottomColor: '#fffaf0',
