@@ -2,8 +2,9 @@ import React, {useEffect, useState} from 'react';
 import {View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput} from 'react-native';
 import {GestureHandlerRootView, Swipeable} from 'react-native-gesture-handler';
 import {useRouter} from 'expo-router';
-import { deleteAlarm, getAllAlarms } from '@/hooks/asyncStorage/useAsyncStorage';
+import { deleteAlarm, getAllAlarms, updateAlarm } from '@/hooks/asyncStorage/useAsyncStorage';
 import Alarm from '@/hooks/asyncStorage/interfaces/Alarm';
+import { Switch } from 'react-native-gesture-handler';
 
 // right actions
 const ListItem = ({item, onDelete }:{item:any; onDelete: (id: string) => void}) => {
@@ -15,12 +16,29 @@ const ListItem = ({item, onDelete }:{item:any; onDelete: (id: string) => void}) 
     </View>
   );
 
+  const [isEnabled, setIsEnabled] = useState(item.enabled)
+
+  const alarmChangeEnable = () => {
+    setIsEnabled(o => {
+      item.enabled = !o
+      console.log(item.enabled)
+      updateAlarm(item.id, item)
+      return !o})
+  }
+
   return (
     <Swipeable renderRightActions={renderRightActions}>
       <View style={styles.item}>
         <View style={styles.itemText}>
         <Text style={styles.itemText}>{item.name}</Text>
         <Text style={styles.itemText}>{new Date(item.time).toLocaleDateString()}</Text>
+        <Switch
+          trackColor={{false: '#767577', true: '#81b0ff'}}
+          thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
+          ios_backgroundColor="#3e3e3e"
+          onValueChange={alarmChangeEnable}
+          value={isEnabled}
+        />
       </View>
         <Text style={{color:'white', marginTop:'auto', fontSize:32}}>{new Date(item.time).toTimeString().split(' ')[0].split(":").slice(0,2).join(":")}</Text>
       </View>

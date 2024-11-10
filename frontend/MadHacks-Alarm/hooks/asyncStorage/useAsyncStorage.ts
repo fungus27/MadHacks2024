@@ -125,3 +125,20 @@ export const deleteObject = async (key: string) => {
     const updatedAlarms = alarms.filter((alarm: Alarm) => alarm.id !== alarmId);
     await storeObject(ALARM_LIST_KEY, updatedAlarms);
   }
+
+  export const updateAlarm = async (alarmId: string, updatedAlarm: Alarm) => {
+    // Get alarms from storage
+    const alarms = await getObject(ALARM_LIST_KEY);
+    console.log(alarmId)
+ 
+    const updatedAlarms = alarms.reduce((prev:any, alarm: Alarm) => {
+      if(alarm.id === alarmId) {
+        return [...prev, updatedAlarm]
+      }
+      else {
+        console.log(alarm.id)
+        return [...prev, alarm]}
+      }, []);
+    await storeObject(ALARM_LIST_KEY, alarms);
+  }
+  
