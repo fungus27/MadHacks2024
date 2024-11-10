@@ -3,6 +3,7 @@ import { getAllAlarms, storeAlarm } from '../asyncStorage/useAsyncStorage';
 import { SoundObject } from 'expo-av/build/Audio';
 import Alarm from '../asyncStorage/interfaces/Alarm'
 import { Sound } from 'expo-av/build/Audio';
+import * as Notifications from 'expo-notifications';
 
 export async function playAudioUrl(url: string, setCurrentAlarmSound:React.Dispatch<React.SetStateAction<Sound|undefined>>, openAlarmRunningScreen: CallableFunction) {
     await Audio.setAudioModeAsync({ playsInSilentModeIOS: true });
@@ -26,7 +27,8 @@ export const setAlarmTimeout = async (alarm: Alarm, setCurrentAlarmSound:React.D
   const currentTime = new Date().getTime()
   const timeout = alarmTime - currentTime
   console.log(timeout, alarmTime, currentTime)
-  return setTimeout(() => {console.log('ring ring');playAlarm(alarm.note, alarm.shouldQuery, setCurrentAlarmSound, openAlarmRunningScreen)}, timeout);
+  setupNotification(alarm, timeout/1000)
+  return setTimeout(() => {console.log('ring ring');playAlarm(setCurrentAlarmSound, openAlarmRunningScreen)}, timeout);
 }
 
 export const setAlarm = async (id:string, time:Date, enable:boolean, name:string, note:string, shouldQuery:boolean, setCurrentAlarmSound: React.Dispatch<React.SetStateAction<Sound|undefined>>, openAlarmRunningScreen: CallableFunction) => {
@@ -34,4 +36,17 @@ export const setAlarm = async (id:string, time:Date, enable:boolean, name:string
   const timeoutId = await setAlarmTimeout(alarm, setCurrentAlarmSound, openAlarmRunningScreen);
   alarm.timeoutId = timeoutId;
   return alarm;
+}
+
+const setupNotification = (alarm:Alarm, triggerSecond:number) => {
+  Notifications.scheduleNotificationAsync({
+    content: {
+      title: alarm.name,
+      body: alarm.note,
+      data: {alarm: alarm}
+    },
+    trigger: {
+      seconds: triggerSecond
+    },
+  });
 }

@@ -1,10 +1,120 @@
-import React, {useEffect, useState} from 'react';
-import {View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, Pressable} from 'react-native';
+import React, {useContext, useEffect, useRef, useState} from 'react';
+import {View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, Pressable, Platform} from 'react-native';
 import {GestureHandlerRootView, Swipeable} from 'react-native-gesture-handler';
 import {useRouter} from 'expo-router';
 import { deleteAlarm, getAllAlarms, updateAlarm } from '@/hooks/asyncStorage/useAsyncStorage';
 import Alarm from '@/hooks/asyncStorage/interfaces/Alarm';
 import { Switch } from 'react-native-gesture-handler';
+import * as Notifications from 'expo-notifications';
+import * as TaskManager from 'expo-task-manager';
+import * as Device from 'expo-device';
+import Constants from 'expo-constants';
+import { playAlarm } from '@/hooks/playAlarm/playAlarm';
+import { AlarmContext } from '@/context/alarmContext';
+
+// notification and task set up
+
+const BACKGROUND_NOTIFICATION_TASK = 'BACKGROUND-NOTIFICATION-TASK';
+const [currentAlarmSound, setCurrentAlarmSound, currentAlarm, setCurrentAlarm] = useContext(AlarmContext)
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
+
+const openAlarmRunningScreen = () => {
+  router.navigate('/alarmRunningScreen')
+}
+
+TaskManager.defineTask(BACKGROUND_NOTIFICATION_TASK, ({ data, error, executionInfo }) => {
+  console.log('Received a notification in the background!');
+  console.log(data.alarm.id)
+  playAlarm(data.alarm.note, data.alarm.shouldQuery, setCurrentAlarmSound, openAlarmRunningScreen)
+});
+
+Notifications.registerTaskAsync(BACKGROUND_NOTIFICATION_TASK);
+
+const notificationListener = useRef<Notifications.Subscription>();
+const responseListener = useRef<Notifications.Subscription>();
+const [expoPushToken, setExpoPushToken] = useState('');
+const [channels, setChannels] = useState<Notifications.NotificationChannel[]>([]);
+const [notification, setNotification] = useState<Notifications.Notification | undefined>(
+  undefined
+);
+
+async function registerForPushNotificationsAsync() {
+  let token;
+
+  if (Platform.OS === 'android') {
+    await Notifications.setNotificationChannelAsync('default', {
+      name: 'default',
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: '#FF231F7C',
+      sound:'default'
+    });
+  }
+
+  if (Device.isDevice) {
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== 'granted') {
+      alert('Failed to get push token for push notification!');
+      return;
+    }
+    // Learn more about projectId:
+    // https://docs.expo.dev/push-notifications/push-notifications-setup/#configure-projectid
+    // EAS projectId is used here.
+    try {
+      const projectId =
+        Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
+      if (!projectId) {
+        throw new Error('Project ID not found');
+      }
+      token = (
+        await Notifications.getExpoPushTokenAsync({
+          projectId,
+        })
+      ).data;
+      console.log(token);
+    } catch (e) {
+      token = `${e}`;
+    }
+  } else {
+    alert('Must use physical device for Push Notifications');
+  }
+
+  return token;
+}
+
+useEffect(() => {
+  registerForPushNotificationsAsync().then(token => token && setExpoPushToken(token));
+
+  if (Platform.OS === 'android') {
+    Notifications.getNotificationChannelsAsync().then(value => setChannels(value ?? []));
+  }
+  notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+    setNotification(notification);
+  });
+
+  responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+    console.log(response);
+  });
+
+  return () => {
+    notificationListener.current &&
+      Notifications.removeNotificationSubscription(notificationListener.current);
+    responseListener.current &&
+      Notifications.removeNotificationSubscription(responseListener.current);
+  };
+}, []);
 
 // right actions
 const ListItem = ({item, onDelete }:{item:any; onDelete: (id: string) => void}) => {
