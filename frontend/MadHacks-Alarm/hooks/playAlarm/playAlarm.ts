@@ -16,7 +16,7 @@ export async function playAudioUrl(url: string, setCurrentAlarmSound:React.Dispa
 }
 
 export const playAlarm = async (setCurrentAlarmSound:React.Dispatch<React.SetStateAction<Sound|undefined>>, openAlarmRunningScreen: CallableFunction) => {  
-  playAudioUrl("https://commondatastorage.googleapis.com/codeskulptor-assets/Epoq-Lepidoptera.ogg", setCurrentAlarmSound, openAlarmRunningScreen)
+  playAudioUrl("http://10.140.27.228:8888/tts/I%20am%20aliveeee,%20yaay!", setCurrentAlarmSound, openAlarmRunningScreen)
 }
 
 export const setAlarmTimeout = async (alarm: Alarm, setCurrentAlarmSound:React.Dispatch<React.SetStateAction<Sound|undefined>>, openAlarmRunningScreen: CallableFunction) => {
