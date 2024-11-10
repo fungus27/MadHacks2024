@@ -1,30 +1,29 @@
 import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet, Button } from 'react-native';
+import { View, TextInput, TouchableOpacity, Text, StyleSheet, Switch } from 'react-native';
 import { useRouter } from 'expo-router'; // This will help navigate back
 import { storeAlarm } from '@/hooks/asyncStorage/useAsyncStorage';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import Alarm from '@/hooks/asyncStorage/interfaces/Alarm';
 
-interface Alarm {
-    id: string;
-    time: Date;
-    enabled: boolean;
-    name: string;
-}
 const AddItemScreen = () => {
   const [newItemText, setNewItemText] = useState('');
   const [date, setDate] = useState(new Date());
   const [openDateModal, setOpenDateModal] = useState(false);
   const [openTimeModal, setOpenTimeModal] = useState(false);
+  const [note, setNote] = useState('');
+  const [query, setQuery] = useState(false);
   const router = useRouter();
 
   const handleAddItem = async () => {
     if (newItemText.trim() !== '') {
       
       const newAlarm: Alarm = {
-        id: new Date().toISOString(), // acts as unique ID
-        time: new Date(),   // sets the current date and time for now
+        id: date.toISOString(), // acts as unique ID
+        time: date,   // sets the current date and time for now
         enabled: true, 
         name: newItemText, // sets text input as the name of the alarm
+        note: note,
+        shouldQuery: query
       };
       // store new alarm using storeAlarm
       await storeAlarm(newAlarm);
@@ -42,47 +41,70 @@ const AddItemScreen = () => {
       setDate(date);
       setOpenTimeModal(true);
     }
-    if (type === 'set' && openTimeModal) {
-      const newDate = new Date(date);
-      newDate.setHours(date.getHours());
-      newDate.setMinutes(date.getMinutes());
-      setDate(newDate);
-      setOpenTimeModal(false);
-    }
-    setOpenDateModal(false); // TODO: We need to dismiss twice to close the modal
+    setOpenDateModal(false);
   };
 
-  console.log(date);
+  const handleTimeChange = (event: DateTimePickerEvent, date: Date) => {
+    const {
+      type,
+      nativeEvent: {timestamp, utcOffset},
+    } = event;
+    if (type === 'set' && openTimeModal) {
+      setDate(date);
+    }
+    setOpenTimeModal(false);
+  }
+
   return (
     <View style={styles.container}>
       <TextInput
         style={styles.input}
         placeholder="Enter new item"
+        placeholderTextColor='#fffaf0'
         value={newItemText}
         onChangeText={setNewItemText}
       />
       <View style={{marginBottom:'5%', flexDirection: 'row'}}>
       <TouchableOpacity style={styles.button} onPress={() => setOpenDateModal(true)}>
         <Text style={styles.buttonText}>Select date and time</Text>
-      </TouchableOpacity>
-      { openDateModal && (
-              <DateTimePicker
-              style={styles.input}
-              onChange={handleDateChange}
-              value={date}
-              minimumDate={new Date()}
-            />
-          )}
-      { openTimeModal && (
-              <DateTimePicker
-              style={styles.input}
-              onChange={handleDateChange}
-              value={date}
-              minimumDate={new Date()}
-              mode="time"
-            />
-          )}
+        </TouchableOpacity>
+        { openDateModal && (
+                <DateTimePicker
+                style={styles.input}
+                onChange={handleDateChange}
+                value={date}
+                minimumDate={new Date()}
+              />
+            )}
+        { openTimeModal && (
+                <DateTimePicker
+                style={styles.input}
+                onChange={handleTimeChange}
+                value={date}
+                minimumDate={new Date()}
+                mode="time"
+              />
+            )}
+            <Text style={{color: '#fffaf0', fontWeight: 'bold', margin:10}}>{date.toLocaleString()}</Text>
           </View>
+      <View style={{marginBottom:'5%', flexDirection: 'row'}}>
+      <TextInput
+        style={{...styles.input, flex: 4}}
+        placeholder="Enter note or query for alarm"
+        placeholderTextColor='#fffaf0'
+        value={note}
+        onChangeText={setNote}
+      />
+      <View style={{justifyContent: 'center'}}>
+        <Text style={{color: '#fffaf0', fontWeight: 'bold'}}>Use query?</Text>
+      <Switch
+        trackColor={{ false: "#767577", true: "#81b0ff" }}
+        thumbColor={query ? "#f5dd4b" : "#f4f3f4"}
+        onValueChange={setQuery}
+        value={query}
+        />
+      </View>
+      </View>
       <TouchableOpacity style={styles.button} onPress={handleAddItem}>
         <Text style={styles.buttonText}>Add Item</Text>
       </TouchableOpacity>
@@ -95,13 +117,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fffaf0',
+    backgroundColor: '#1D3D47',
     padding: 20,
   },
   input: {
     height: 50,
     width: '100%',
     borderColor: '#ccc',
+    color: '#fffaf0',
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 10,

@@ -3,6 +3,8 @@ export default interface Alarm {
     time: Date;
     enabled: boolean;
     name: string;
+    note: string;
+    shouldQuery: boolean;
     // repeat: boolean;
     // repeatDays: boolean[];
 }
