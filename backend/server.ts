@@ -13,7 +13,7 @@ const PORT = 8888;
 app.use(express.json())
 app.use(cors())
 
-app.post('/tts', sendTTSResponse);
+app.get('/tts/:text', sendTTSResponse);
 app.get('/llm/:prompt', sendLLMResponse);
 
 app.listen(PORT, () => {

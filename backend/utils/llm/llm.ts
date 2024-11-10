@@ -36,11 +36,9 @@ export default async function sendLLMResponse(req, res) {
     `;
 
     const result = await model.generateContent(searchResults);
+    const sentence = result['response']['candidates'][0]['content']['parts'][0]['text'];
 
-    const audioData = await getTextAudio(result); 
+    const audioFileName = await getTextAudio(result);
     
-    res.json({
-        sentence: result['response']['candidates'][0]['content']['parts'][0]['text'],
-        audio: audioData
-    })
+    res.send(audioFileName);
 }
