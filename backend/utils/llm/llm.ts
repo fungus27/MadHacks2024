@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import websearch from '../websearch/websearch';
+import { getTextAudio } from '../tts/tts';
 import dotenv from 'dotenv'; 
 
 dotenv.config()
@@ -21,7 +22,6 @@ const model = genAI.getGenerativeModel({
 
 export default async function sendLLMResponse(req, res) {
     const prompt = req.params.prompt;
-    console.log(prompt)
 
     if (!prompt) {
         console.log("Invalid request");
@@ -35,11 +35,12 @@ export default async function sendLLMResponse(req, res) {
     RESULTS: "${searchResults}"
     `;
 
-    console.log(template)
-
     const result = await model.generateContent(searchResults);
+
+    const audioData = await getTextAudio(result); 
     
     res.json({
-        data: result
+        sentence: result['response']['candidates'][0]['content']['parts'][0]['text'],
+        audio: audioData
     })
 }

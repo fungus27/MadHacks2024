@@ -1,10 +1,13 @@
 import * as textToSpeech from '@google-cloud/text-to-speech';
 import { Request, Response } from 'express';
 import { Buffer } from "buffer";
+import dotenv from 'dotenv'; 
+
+dotenv.config()
 
 const client = new textToSpeech.TextToSpeechClient(); // uses ADC
 
-async function getTextAudio(text: string,
+export async function getTextAudio(text: string,
                             languageCode : string = 'en-US',
                             audioEncoding : string = 'MP3',
                             gender : string = 'NEUTRAL') {
@@ -16,7 +19,7 @@ async function getTextAudio(text: string,
 
   //@ts-ignore
   const [response] = await client.synthesizeSpeech(request);
-  return response.audioContent;
+  return response.audioContent.toString('base64');
 }
 
 export default async function sendTTSResponse(req : Request, res : Response) {
@@ -25,9 +28,9 @@ export default async function sendTTSResponse(req : Request, res : Response) {
 
     const text = req.body['text']; 
 
-    const audioData: Buffer = await getTextAudio(text);
+    const audioData = await getTextAudio(text);
 
     res.json({
-        data: audioData.toString('base64')
+        audio: audioData
     }); 
 }
