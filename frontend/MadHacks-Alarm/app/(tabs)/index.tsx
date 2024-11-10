@@ -1,99 +1,72 @@
-import React from 'react';
-import {View, Text, StyleSheet, FlatList, TouchableOpacity} from 'react-native';
-import {GestureHandlerRootView, Swipeable} from 'react-native-gesture-handler';
-import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import { Image, StyleSheet, Platform } from 'react-native';
 
-// list items
-const DATA = [
-  {id: '1', text: 'WAKE UP'},
-  {id: '2', text: 'When Life Gives You Lemons'},
-  {id: '3', text: 'Teeheehooha'},
-  {id: '4', text: 'This is an app'},
-  {id: '5', text: 'Im breaking up with u'},
-  {id: '6', text: 'HELLOOOOOOOOOOOOO'},
-  {id: '7', text: 'Banana smoothie'},
-  {id: '8', text: 'Getting inebriated'},
-  {id: '9', text: '1000 BEERS'},
-  {id: '10', text: 'ON WISCONSIN'},
-  {id: '11', text: 'Lalalalalala'},
-  {id: '12', text: 'HELLOOOOOOOOOOOOO'},
-  {id: '13', text: 'Big Chungus'},
-  {id: '14', text: 'Can I have a mbnnfdmfmmdfduhhhhhhhhhhh'},
-  {id: '15', text: 'Burger'},
-];
-// bottom tabs
-const Tab = createBottomTabNavigator();
+import { HelloWave } from '@/components/HelloWave';
+import ParallaxScrollView from '@/components/ParallaxScrollView';
+import { ThemedText } from '@/components/ThemedText';
+import { ThemedView } from '@/components/ThemedView';
 
-// right actions
-const ListItem = ({item} : {item:any}) => {
-  const renderRightActions = () => (
-    <View style={styles.actionsContainer}>
-      <TouchableOpacity style={[styles.button, styles.edit]}>
-        <Text style={styles.actionText}>Edit</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={[styles.button, styles.delete]}>
-        <Text style={styles.actionText}>Delete</Text>
-      </TouchableOpacity>
-    </View>
-  );
+import { Button } from 'react-native';
 
+export default function HomeScreen() {
   return (
-    <Swipeable renderRightActions={renderRightActions}>
-      <View style={styles.item}>
-        <Text style={styles.itemText}>{item.text}</Text>
-      </View>
-    </Swipeable>
+    <ParallaxScrollView
+      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
+      headerImage={
+        <Image
+          source={require('@/assets/images/partial-react-logo.png')}
+          style={styles.reactLogo}
+        />
+      }>
+      <ThemedView style={styles.titleContainer}>
+        <ThemedText type="title">Welcome!</ThemedText>
+        <HelloWave />
+      </ThemedView>
+      <ThemedView style={styles.stepContainer}>
+        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
+        <ThemedText>
+          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
+          Press{' '}
+          <ThemedText type="defaultSemiBold">
+            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
+          </ThemedText>{' '}
+          to open developer tools.
+        </ThemedText>
+      </ThemedView>
+      <ThemedView style={styles.stepContainer}>
+        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
+        <ThemedText>
+          Tap the Explore tab to learn more about what's included in this starter app.
+        </ThemedText>
+      </ThemedView>
+      <ThemedView style={styles.stepContainer}>
+        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
+        <ThemedText>
+          When you're ready, run{' '}
+          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
+          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
+          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
+          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
+        </ThemedText>
+      </ThemedView>
+    </ParallaxScrollView>
   );
-};
+}
 
-// List view
-const DataList = () => {
-  return (
-    <GestureHandlerRootView style={styles.container}>
-      <FlatList
-        data={DATA}
-        keyExtractor={item => item.id}
-        renderItem={({item}) => <ListItem item={item} />}
-      />
-    </GestureHandlerRootView>
-  );
-};
-
-export default DataList;
-
-// styles
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#008b8b',
-  },
-  item: {
-    padding: 20,
-    marginBottom: 2,
-    backgroundColor: '#e6e6fa',
-  },
-  itemText: {
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  actionsContainer: {
+  titleContainer: {
     flexDirection: 'row',
-    marginBottom: 2,
-  },
-  button: {
-    width: 80,
-    height: '100%',
-    justifyContent: 'center',
     alignItems: 'center',
+    gap: 8,
   },
-  edit: {
-    backgroundColor: '#ffab00',
+  stepContainer: {
+    gap: 8,
+    marginBottom: 8,
   },
-  delete: {
-    backgroundColor: '#ff1744',
-  },
-  actionText: {
-    color: '#fff',
-    fontWeight: 'bold',
+  reactLogo: {
+    height: 178,
+    width: 290,
+    bottom: 0,
+    left: 0,
+    position: 'absolute',
   },
 });
