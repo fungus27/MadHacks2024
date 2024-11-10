@@ -6,10 +6,22 @@ dotenv.config()
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+const systemPrompt = "You are a helpful morning assistant. Given the QUERY and the search engine result RESULTS sent by the user, please give the user the exact information they want in one sentence. Be consistent, objective and concise."
+
+const model = genAI.getGenerativeModel({ 
+    model: "gemini-1.5-flash",
+    generationConfig: {
+        candidateCount: 1,
+        maxOutputTokens: 180,
+        temperature: 0.3,
+        top_p: 0.95
+    },
+    systemInstruction: systemPrompt
+});
 
 export default async function sendLLMResponse(req, res) {
     const prompt = req.params.prompt;
+    console.log(prompt)
 
     if (!prompt) {
         console.log("Invalid request");
@@ -18,13 +30,12 @@ export default async function sendLLMResponse(req, res) {
 
     const searchResults = await websearch(prompt);
 
-    const template = `
-    You are a search result summarizer, given the QUERY below and the output of a search result, please give the user the information they want in at most three sentences. Your only job is to summarize as if you were reporting the news. Be objective, consistent, and include details.
+    const template = `QUERY: "${prompt}"
 
-    QUERY: "${prompt}"
-    
     RESULTS: "${searchResults}"
     `;
+
+    console.log(template)
 
     const result = await model.generateContent(searchResults);
     
