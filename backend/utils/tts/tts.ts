@@ -12,8 +12,8 @@ tmp.setGracefulCleanup();
 
 const client = new textToSpeech.TextToSpeechClient(); // uses ADC
 
-
 export async function getTextAudio(text: string,
+                            query : string,
                             languageCode : string = 'en-US',
                             audioEncoding : string = 'MP3',
                             gender : string = 'NEUTRAL') {
@@ -39,6 +39,7 @@ export async function getTextAudio(text: string,
   const [response] = await client.synthesizeSpeech(request);
   const writeFile = util.promisify(fs.writeFile);
   const tmpFile = tmp.fileSync({tmpdir: ".", postfix: ".mp3"});
+
   console.log(tmpFile.name);
 
   await writeFile(tmpFile.name, response.audioContent, 'binary');
@@ -55,5 +56,5 @@ export default async function sendTTSResponse(req : Request, res : Response) {
         audioFile: audioFileName
     });  */
 
-   res.sendFile(audioFileName);
+   res.sendFile(audioFileName, {acceptRanges: false});
 }
