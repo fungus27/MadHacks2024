@@ -153,17 +153,11 @@ const styles = StyleSheet.create({
   },
   addItemContainer: {
     padding: 20,
-    // flexDirection: 'row',
-    // justifyContent: 'space-between',
-    // alignItems: 'center',
     borderTopWidth: 1,
     borderTopColor: '#fffaf0',
-    // backgroundColor: '#2f4f4f',
   },
   textInput: {
-    // flex: 1,
     padding: 10,
-    // marginRight: 10,
     marginBottom: 10,
     backgroundColor: '#fff',
     color: '#333',
@@ -172,7 +166,6 @@ const styles = StyleSheet.create({
   },
   addButton: {
     paddingVertical: 10,
-    // paddingHorizontal: 20,
     backgroundColor: '#ffab00',
     borderRadius: 5,
   },
